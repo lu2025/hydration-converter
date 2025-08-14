@@ -1,40 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Liquid Unit Converter</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hydration Converter</title>
   <style>
-    body { font-family: sans-serif; padding: 10px; }
-    input, select { margin: 5px; padding: 5px; }
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #f9f9f9;
+    }
+    #converterBar {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(to right, #e0f7ff, #f0fcff);
+      padding: 6px 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      z-index: 9999;
+      max-width: 480px;
+      width: 100%;
+    }
+    #converterBar input, #converterBar select {
+      padding: 4px;
+      font-size: 14px;
+    }
+    #converterBar .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+    }
+    .spacer {
+      height: 140px;
+    }
   </style>
 </head>
 <body>
-  <h2>Liquid Unit Converter</h2>
-  <input type="number" id="inputValue" placeholder="Enter value">
-  <select id="inputUnit">
-    <option value="ml">Milliliters (ml)</option>
-    <option value="oz">Fluid Ounces (oz)</option>
-  </select>
-  →
-  <select id="outputUnit">
-    <option value="ml">Milliliters (ml)</option>
-    <option value="oz">Fluid Ounces (oz)</option>
-  </select>
-  <button onclick="convert()">Convert</button>
-  <p id="result"></p>
+  <div id="converterBar">
+    <div class="row">
+      <input id="inputLeft" type="number" value="1" style="width: 80px;">
+      <select id="unitLeft">
+        <option value="oz">oz</option>
+        <option value="cup">cup</option>
+        <option value="pint">pint</option>
+        <option value="quart">quart</option>
+        <option value="gallon" selected>gallon</option>
+        <option value="ml">ml</option>
+        <option value="liter">liter</option>
+      </select>
+      <span style="font-weight: bold;">⇄</span>
+      <input id="inputRight" type="number" value="128" style="width: 80px;">
+      <select id="unitRight">
+        <option value="oz" selected>oz</option>
+        <option value="cup">cup</option>
+        <option value="pint">pint</option>
+        <option value="quart">quart</option>
+        <option value="gallon">gallon</option>
+        <option value="ml">ml</option>
+        <option value="liter">liter</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
 
   <script>
-    function convert() {
-      const value = parseFloat(document.getElementById('inputValue').value);
-      const from = document.getElementById('inputUnit').value;
-      const to = document.getElementById('outputUnit').value;
-      let result = value;
+    const rates = {
+      oz: 1,
+      cup: 8,
+      pint: 16,
+      quart: 32,
+      gallon: 128,
+      ml: 0.033814,
+      liter: 33.814
+    };
 
-      if (from === 'ml' && to === 'oz') result = value * 0.033814;
-      else if (from === 'oz' && to === 'ml') result = value / 0.033814;
-
-      document.getElementById('result').textContent = `${value} ${from} = ${result.toFixed(2)} ${to}`;
+    function convert(fromValue, fromUnit, toUnit) {
+      const valueInOz = fromValue * rates[fromUnit];
+      return valueInOz / rates[toUnit];
     }
+
+    function updateRight() {
+      const fromValue = parseFloat(document.getElementById("inputLeft").value);
+      const fromUnit = document.getElementById("unitLeft").value;
+      const toUnit = document.getElementById("unitRight").value;
+      if (!isNaN(fromValue)) {
+        document.getElementById("inputRight").value = convert(fromValue, fromUnit, toUnit).toFixed(2);
+      }
+    }
+
+    function updateLeft() {
+      const toValue = parseFloat(document.getElementById("inputRight").value);
+      const toUnit = document.getElementById("unitRight").value;
+      const fromUnit = document.getElementById("unitLeft").value;
+      if (!isNaN(toValue)) {
+        document.getElementById("inputLeft").value = convert(toValue, toUnit, fromUnit).toFixed(2);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("inputLeft").addEventListener("input", updateRight);
+      document.getElementById("unitLeft").addEventListener("change", updateRight);
+      document.getElementById("unitRight").addEventListener("change", updateRight);
+      document.getElementById("inputRight").addEventListener("input", updateLeft);
+    });
   </script>
 </body>
 </html>
+
