@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Unit Converter</title>
+  <style>
+    body { font-family: sans-serif; padding: 12px; }
+    #converterBar { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; align-items: center; }
+    input, select { padding: 6px; width: 100px; }
+  </style>
+</head>
+<body>
+  <div id="converterBar">
+    <input id="inputLeft" type="number" value="1">
+    <select id="unitLeft">
+      <option value="oz">oz</option>
+      <option value="cup">cup</option>
+      <option value="pint">pint</option>
+      <option value="quart">quart</option>
+      <option value="gallon" selected>gallon</option>
+      <option value="ml">ml</option>
+      <option value="liter">liter</option>
+    </select>
+    <span>⇄</span>
+    <input id="inputRight" type="number" value="128">
+    <select id="unitRight">
+      <option value="oz" selected>oz</option>
+      <option value="cup">cup</option>
+      <option value="pint">pint</option>
+      <option value="quart">quart</option>
+      <option value="gallon">gallon</option>
+      <option value="ml">ml</option>
+      <option value="liter">liter</option>
+    </select>
+  </div>
+
+  <script>
+    const rates = {
+      oz: 1, cup: 8, pint: 16, quart: 32, gallon: 128, ml: 0.033814, liter: 33.814
+    };
+
+    function convert(fromValue, fromUnit, toUnit) {
+      const valueInOz = fromValue * rates[fromUnit];
+      return valueInOz / rates[toUnit];
+    }
+
+    function updateRight() {
+      const fromValue = parseFloat(inputLeft.value);
+      const fromUnit = unitLeft.value;
+      const toUnit = unitRight.value;
+      if (!isNaN(fromValue)) {
+        inputRight.value = convert(fromValue, fromUnit, toUnit).toFixed(2);
+      }
+    }
+
+    function updateLeft() {
+      const toValue = parseFloat(inputRight.value);
+      const toUnit = unitRight.value;
+      const fromUnit = unitLeft.value;
+      if (!isNaN(toValue)) {
+        inputLeft.value = convert(toValue, toUnit, fromUnit).toFixed(2);
+      }
+    }
+
+    inputLeft.addEventListener("input", updateRight);
+    unitLeft.addEventListener("change", updateRight);
+    unitRight.addEventListener("change", updateRight);
+    inputRight.addEventListener("input", updateLeft);
+  </script>
+</body>
+</html>
